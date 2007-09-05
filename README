@@ -1,0 +1,81 @@
+NAME
+    POE::Loop::Event_Lib - a bridge that supports Event::Lib from POE
+
+SYNOPSIS
+    See POE::Loop.
+
+BROKEN / IN DEVELOPMENT
+    There's a reason for the underscore in the version number. This software
+    is definitely broken at the moment, so don't even think about using it
+    anywhere that needs to not be broken.
+
+    All of my testing is against the latest POE, Event::Lib,
+    POE::Test::Loops, and libevent (1.3d).
+
+    Currently, on MacOS X, it passes the test suite if you use the "EVENT_*"
+    env vars to limit it to either the "select", or "poll" method, but it
+    still fails one test with "kqueue" (but then again, libevent's own
+    regression tests fail with "kqueue" on this box/environment, so I'm not
+    sure this is my fault).
+
+    On Linux (recent 2.6-based distro), it passes all tests under "select",
+    but has some isolated failures under both "poll" and "epoll".
+
+    I think it's fair to assume something is actually incorrect either in
+    this code (more likely), Event::Lib (less likely), or libevent (really
+    unlikely). It's possible this is related to some impedance mismatch
+    between the libevent and POE models that I haven't fully grokked yet.
+
+    I've also just installed it anyways and tried an actual complicated
+    POE-based daemon of mine against it on the Mac. The app actually runs
+    successfully in most cases, even with "kqueue", so long as I run the app
+    in debug mode (no daemonization via doublefork/setsid, and all logging
+    straight to stderr). When I turn on daemonization and logging, things
+    get stuck very early on.
+
+    YMMV, I'm mainly putting this out here hoping someone else will find the
+    problems faster than me and send a patch :)
+
+DESCRIPTION
+    This class is an implementation of the abstract POE::Loop interface. It
+    follows POE::Loop's public interface exactly. Therefore, please see
+    POE::Loop for its documentation.
+
+    Event::Lib is a Perl abstraction of "libevent", which supports the
+    following underlying mechanisms on different platforms: "select",
+    "poll", "devpoll", "epoll", and "kqueue".
+
+    By default, it will select the best available mechanism. You can disable
+    certain mechanisms from being selected via the environment variables
+    "EVENT_NOPOLL", "EVENT_NOSELECT", "EVENT_NOEPOLL", "EVENT_NODEVPOLL",
+    and "EVENT_NOKQUEUE". These environment variables must be set before
+    "use"-ing POE::Loop::Event_Lib.
+
+    Of note, not all underlying mechanisms support operations on regular
+    physical files (some only support things like sockets and pipes). See
+    the Event::Lib documentation for more information.
+
+SEE ALSO
+    POE, POE::Loop, Event::Lib
+
+AUTHOR
+    Brandon L. Black <blblack@gmail.com>
+
+LICENSE
+    POE::Loop::Event_Lib is free software; you may redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+IGNORE ME
+    This is for some automated test generation stuff...
+
+    sub skip_tests { return "Event::Lib tests require the Event::Lib module"
+    if ( do { eval "use Event::Lib"; $@ } );
+
+      my $test_name = shift;
+      if ($^O eq 'darwin' and Event::Lib::get_method() ne 'select') {
+        if($test_name eq "wheel_readline" or $test_name eq "wheel_run") {
+          return "This test only works with the Event::Lib 'select' method on $^O";
+        }
+      }
+    }
+

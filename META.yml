@@ -1,0 +1,26 @@
+--- 
+abstract: a bridge that supports Event::Lib from POE
+author: Brandon L. Black <blblack@gmail.com>
+build_requires: 
+  POE::Test::DondeEstan: 0
+  Test::More: 0.47
+distribution_type: module
+generated_by: Module::Install version 0.670
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: POE-Loop-Event_Lib
+no_index: 
+  directory: 
+    - inc
+    - t
+provides: 
+  POE::Loop::Event_Lib: 
+    file: lib/POE/Loop/Event_Lib.pm
+    version: 0.001_01
+requires: 
+  Event::Lib: 1.03
+  POE: 0.9999
+tests: t/*.t t/*/*/*.t
+version: 0.001_01
